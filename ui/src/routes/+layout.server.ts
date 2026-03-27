@@ -3,11 +3,18 @@ import type { LayoutServerLoad } from './$types';
 
 export const prerender = false;
 
-export const load: LayoutServerLoad = () => {
+export const load: LayoutServerLoad = ({ cookies }) => {
+  const profileCookie = cookies.get('student_profile');
+  let profile = null;
+  if (profileCookie) {
+    try {
+      profile = JSON.parse(profileCookie);
+    } catch (e) { /* ignore */ }
+  }
+
   const stats = getSourceStats();
   const lastChecked = getLastCheckedTime();
   const categoryCounts = getCategoryCounts();
-  const profile = getStudentProfile();
   const todayChangeIds = getTodayChangeIds();
   const todayTotalIds = getTodayTotalIds();
 

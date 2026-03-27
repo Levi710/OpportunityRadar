@@ -114,7 +114,12 @@ export function getTodayTotalIds(): number[] {
 }
 
 export function getStudentProfile(): StudentProfile | null {
-  return getDb().prepare('SELECT * FROM student_profiles LIMIT 1').get() as StudentProfile || null;
+  try {
+    return getDb().prepare('SELECT * FROM student_profiles LIMIT 1').get() as StudentProfile || null;
+  } catch (e) {
+    // Return null if table doesn't exist yet (migrations not run)
+    return null;
+  }
 }
 
 export function upsertStudentProfile(profile: Omit<StudentProfile, 'id' | 'update_count'>): void {

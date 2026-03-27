@@ -2,30 +2,45 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { upsertStudentProfile } from '$lib/db';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
   try {
-    const profile = await request.json();
+    const profileData = await request.json();
     
     // Simple validation
-    if (!profile.branch || !profile.year) {
+    if (!profileData.branch || !profileData.year) {
       return json({ success: false, error: 'Branch and Year are required' }, { status: 400 });
     }
 
-    const currentProfile = await import('$lib/db').then(db => db.getStudentProfile());
+    const currentCookie = cookies.get('student_profile');
+    let updateCount = 0;
     
-    // Limit to 2 saves total (initial + one update)
-    // First save: currentProfile is null -> OK (Result = 0)
-    // Second save: update_count=0 -> OK (Result = 1)
-    // Third save: update_count=1 -> Blocked
-    if (currentProfile && currentProfile.update_count >= 1) {
-      return json({ success: false, error: 'Profile modification limit reached (2/2)' }, { status: 403 });
+    if (currentCookie) {
+      try {
+        const existing = JSON.parse(currentCookie);
+        updateCount = (existing.update_count || 0);
+
+        // Limit check
+        if (updateCount >= 2) {
+          return json({ success: false, error: 'Maximum updates reached for this browser (2/2)' }, { status: 403 });
+        }
+        updateCount++;
+      } catch (e) { /* corrupted cookie - reset count */ }
     }
 
-    upsertStudentProfile({
-      name: profile.name || '',
-      college: profile.college || '',
-      branch: profile.branch,
-      year: parseInt(profile.year),
+    const newProfile = {
+      name: profileData.name || '',
+      college: profileData.college || '',
+      branch: profileData.branch,
+      year: parseInt(profileData.year),
+      update_count: updateCount
+    };
+
+    cookies.set('student_profile', JSON.stringify(newProfile), {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      httpOnly: false, // Let client JS read if needed
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
     });
 
     return json({ success: true });
