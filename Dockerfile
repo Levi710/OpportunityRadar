@@ -50,9 +50,11 @@ COPY --chown=appuser:appuser . .
 # Persistent storage for SQLite (survives redeployments)
 RUN mkdir -p /data && chown appuser:appuser /data
 
+# Runtime Environment Variables
 ENV DATABASE_PATH=/data/opportunityradar.db
 ENV PORT=7860
 ENV NODE_ENV=production
+ENV PYTHONUNBUFFERED=1
 ENV PLAYWRIGHT_BROWSERS_PATH=/home/appuser/.cache/ms-playwright
 
 RUN chmod +x /app/start.sh
