@@ -46,5 +46,6 @@ export interface StudentProfile {
   branch: string;
   year: number;
   college: string;
+  update_count: number;
   verified?: boolean;
 }

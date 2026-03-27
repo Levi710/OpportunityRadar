@@ -66,5 +66,5 @@
     {/each}
   </div>
 
-  <FeedList changes={data.changes} />
+  <FeedList changes={data.changes} lastCheckedTime={data.lastCheckedTime} />
 </div>

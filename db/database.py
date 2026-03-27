@@ -50,6 +50,13 @@ def init_db():
         conn.execute("ALTER TABLE sources ADD COLUMN tags TEXT DEFAULT '[\"all\"]'")
         logger.info("Added tags column to sources table")
 
+    # Migration: Add update_count to student_profiles if missing
+    cursor = conn.execute("PRAGMA table_info(student_profiles)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if "update_count" not in columns:
+        conn.execute("ALTER TABLE student_profiles ADD COLUMN update_count INTEGER DEFAULT 0")
+        logger.info("Added update_count column to student_profiles table")
+
     # Snapshots table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS snapshots (
@@ -72,6 +79,7 @@ def init_db():
             branch TEXT NOT NULL,
             year INTEGER NOT NULL,
             college TEXT,
+            update_count INTEGER DEFAULT 0,
             verified BOOLEAN DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );

@@ -117,14 +117,19 @@ export function getStudentProfile(): StudentProfile | null {
   return getDb().prepare('SELECT * FROM student_profiles LIMIT 1').get() as StudentProfile || null;
 }
 
-export function upsertStudentProfile(profile: Omit<StudentProfile, 'id'>): void {
+export function upsertStudentProfile(profile: Omit<StudentProfile, 'id' | 'update_count'>): void {
+  // Use a writable connection for profile updates
   const writeDb = new Database(dbPath);
   try {
     writeDb.prepare(`
-      INSERT INTO student_profiles (email, name, branch, year, college)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO student_profiles (email, name, branch, year, college, update_count)
+      VALUES (?, ?, ?, ?, ?, 0)
       ON CONFLICT(email) DO UPDATE SET
-      name=excluded.name, branch=excluded.branch, year=excluded.year, college=excluded.college
+      name=excluded.name, 
+      branch=excluded.branch, 
+      year=excluded.year, 
+      college=excluded.college,
+      update_count = update_count + 1
     `).run('user@local', profile.name, profile.branch, profile.year, profile.college);
   } finally {
     writeDb.close();

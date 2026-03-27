@@ -122,12 +122,18 @@
     <div class="flex flex-col items-start gap-4 pt-4 sm:ml-[120px]">
       <button
         onclick={saveProfile}
-        disabled={saving}
+        disabled={saving || (data.profile && data.profile.update_count >= 1)}
         class="bg-orange-primary text-[#0F0F0F] text-sm font-semibold px-8 py-2.5 rounded-md hover:bg-orange-primary/90 transition-opacity disabled:opacity-50"
       >
         {saving ? 'Saving...' : 'Save profile'}
       </button>
       
+      {#if data.profile}
+        <p class="text-[11px] text-silver-subtle uppercase tracking-widest mt-2">
+          Profile saves: {Math.min(2, data.profile.update_count + 1)} / 2
+        </p>
+      {/if}
+
       {#if message}
         <p class="text-sm text-silver-subtle italic">{message}</p>
       {/if}

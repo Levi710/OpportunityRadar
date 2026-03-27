@@ -21,8 +21,12 @@ export const load: PageServerLoad = async ({ url, parent }) => {
     limit: 50
   });
 
+  const { getLastCheckedTime } = await import('$lib/db');
+  const lastCheckedTime = getLastCheckedTime();
+
   return {
     changes,
-    filter
+    filter,
+    lastCheckedTime
   };
 };

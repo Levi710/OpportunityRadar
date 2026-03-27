@@ -3,7 +3,7 @@
   import type { ChangeEvent } from '$lib/types';
   import { seenState } from '$lib/seenState.svelte';
 
-  let { changes, emptyMessage = "No changes detected yet." } = $props();
+  let { changes, lastCheckedTime = null, emptyMessage = "No changes detected yet." } = $props();
 
   function isNew(id: number): boolean {
     return !seenState.ids.has(id);
@@ -19,9 +19,21 @@
 </script>
 
 {#if changes.length === 0}
-  <div class="text-center py-20">
-    <p class="text-silver-subtle text-sm">{emptyMessage}</p>
-    <p class="text-silver-subtle text-sm mt-1">The system checks every 6 hours.</p>
+  <div class="text-center py-24 bg-bg-secondary/50 rounded-lg border border-border border-dashed">
+    {#if !lastCheckedTime}
+      <div class="flex flex-col items-center">
+        <div class="w-12 h-12 border-2 border-orange-primary/20 border-t-orange-primary rounded-full animate-spin mb-4"></div>
+        <p class="text-silver-primary font-medium">Preparing initial opportunities...</p>
+        <p class="text-silver-subtle text-xs mt-2 max-w-[280px]">
+          The first scan takes about 60 seconds. We're checking 25+ official sources for you.
+        </p>
+      </div>
+    {:else}
+      <div class="opacity-80">
+        <p class="text-silver-primary text-sm font-medium">{emptyMessage}</p>
+        <p class="text-silver-subtle text-xs mt-1">The system automatically re-scans every 6 hours.</p>
+      </div>
+    {/if}
   </div>
 {:else}
   <div class="flex flex-col gap-px overflow-hidden rounded-[6px] border border-border">

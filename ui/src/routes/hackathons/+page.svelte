@@ -13,5 +13,9 @@
     <p class="text-[13px] text-silver-muted mt-2">{data.categoryDesc}</p>
   </header>
 
-  <FeedList changes={data.changes} emptyMessage="No {data.categoryName.toLowerCase()} detected recently." />
+  <FeedList 
+    changes={data.changes} 
+    lastCheckedTime={data.lastChecked}
+    emptyMessage="No {data.categoryName.toLowerCase()} detected recently." 
+  />
 </div>
