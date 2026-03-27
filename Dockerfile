@@ -1,6 +1,14 @@
 # Build stage for SvelteKit
-FROM node:18-slim AS ui-builder
+FROM node:20-slim AS ui-builder
 WORKDIR /app/ui
+
+# Install build dependencies for better-sqlite3
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY ui/package*.json ./
 RUN npm install
 COPY ui/ .
@@ -10,14 +18,14 @@ RUN npm run build
 FROM python:3.11-slim
 WORKDIR /app
 
-# Install Node.js (needed for running the SvelteKit build)
+# Install Node.js 20
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     build-essential \
     python3-dev \
     libsqlite3-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
