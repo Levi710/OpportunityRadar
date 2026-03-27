@@ -28,7 +28,6 @@
     {#each changes as change}
       <div
         role="listitem"
-        tabindex="0"
         class="bg-bg-secondary p-5 transition-colors duration-150 hover:bg-bg-tertiary border-b border-border last:border-b-0"
         onmouseenter={() => seenState.markSeen(change.id)}
       >

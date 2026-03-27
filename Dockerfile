@@ -12,6 +12,11 @@ RUN apt-get update && apt-get install -y curl \
 # 1. Setup Environment
 COPY . .
 
+# Set environment variables for build and runtime
+ENV NODE_ENV=production
+ENV PORT=7860
+ENV DATABASE_PATH=/app/opportunityradar.db
+
 # 2. Build the UI
 RUN cd ui && npm install
 RUN cd ui && npm run build
@@ -28,10 +33,5 @@ RUN chmod +x /app/start.sh
 
 # Expose the HF Spaces port
 EXPOSE 7860
-
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=7860
-ENV DATABASE_PATH=/app/opportunityradar.db
 
 CMD ["/app/start.sh"]
