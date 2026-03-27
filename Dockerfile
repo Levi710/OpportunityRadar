@@ -39,7 +39,7 @@ RUN playwright install chromium
 
 # Copy UI and build it (layer cache — only reruns if ui/ changes)
 COPY ui/package*.json ./ui/
-RUN cd ui && npm ci
+RUN cd ui && npm install
 
 COPY ui/ ./ui/
 RUN cd ui && npm run build
