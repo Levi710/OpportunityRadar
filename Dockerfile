@@ -12,14 +12,16 @@ RUN apt-get update && apt-get install -y curl \
 # 1. Setup Environment
 COPY . .
 
-# Set environment variables for build and runtime
-ENV NODE_ENV=production
+# Set environment variables for runtime
 ENV PORT=7860
 ENV DATABASE_PATH=/app/opportunityradar.db
 
-# 2. Build the UI
+# 2. Build the UI (Vite needs devDependencies)
 RUN cd ui && npm install
 RUN cd ui && npm run build
+
+# Put into production mode for runtime
+ENV NODE_ENV=production
 
 # 3. Setup the Scraper
 RUN pip install --no-cache-dir -r requirements.txt
