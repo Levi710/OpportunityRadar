@@ -23,4 +23,3 @@ ui/.env
 ui/node_modules/
 ui/.svelte-kit/
 ui/build/
-ui/package-lock.json
