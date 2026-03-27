@@ -1,0 +1,26 @@
+# Build artifacts
+node_modules/
+.svelte-kit/
+build/
+dist/
+.env
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+.vscode/
+
+# Project specific
+*.db
+*.log
+ui/.env
+ui/node_modules/
+ui/.svelte-kit/
+ui/build/
+ui/package-lock.json

@@ -1,0 +1,202 @@
+[
+  {
+    "name": "NPTEL New Courses",
+    "url": "https://nptel.ac.in/courses",
+    "css_selector": "div.course-list",
+    "is_js_rendered": true,
+    "category": "certifications",
+    "tags": ["all"]
+  },
+  {
+    "name": "SWAYAM Programs",
+    "url": "https://swayam.gov.in",
+    "css_selector": "div.course-card",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["all"]
+  },
+  {
+    "name": "AICTE Schemes",
+    "url": "https://www.aicte-india.org/schemes",
+    "css_selector": "div.views-element-container",
+    "is_js_rendered": false,
+    "category": "government",
+    "tags": ["all"]
+  },
+  {
+    "name": "Microsoft Learn Students",
+    "url": "https://learn.microsoft.com/en-us/training/student-hub/",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "Google Developer Students",
+    "url": "https://developers.google.com/community/gdsc",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "AWS Educate",
+    "url": "https://aws.amazon.com/education/awseducate/",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "IBM SkillsBuild Students",
+    "url": "https://skillsbuild.org/students",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece", "mech", "civil"]
+  },
+  {
+    "name": "Google Career Certificates",
+    "url": "https://grow.google/certificates/",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece", "management"]
+  },
+  {
+    "name": "Cisco NetAcad",
+    "url": "https://www.netacad.com/courses/all",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "Oracle Academy",
+    "url": "https://academy.oracle.com/en/oa-student-hub.html",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it"]
+  },
+  {
+    "name": "GitHub Student Pack",
+    "url": "https://education.github.com/pack",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "Devfolio Hackathons",
+    "url": "https://devfolio.co/hackathons",
+    "css_selector": "main",
+    "is_js_rendered": true,
+    "category": "hackathons",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "Unstop Competitions",
+    "url": "https://unstop.com/competitions",
+    "css_selector": "main",
+    "is_js_rendered": true,
+    "category": "hackathons",
+    "tags": ["all"]
+  },
+  {
+    "name": "Smart India Hackathon",
+    "url": "https://www.sih.gov.in",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "hackathons",
+    "tags": ["all"]
+  },
+  {
+    "name": "HackerEarth Challenges",
+    "url": "https://www.hackerearth.com/challenges/",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "hackathons",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "Internshala Student Internships",
+    "url": "https://internshala.com/internships/",
+    "css_selector": "div#internship_list_container_1",
+    "is_js_rendered": false,
+    "category": "internships",
+    "tags": ["all"]
+  },
+  {
+    "name": "ISRO Student Opportunities",
+    "url": "https://www.isro.gov.in/Careers.html",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "government",
+    "tags": ["ece", "mech", "cs", "it"]
+  },
+  {
+    "name": "DRDO Internship",
+    "url": "https://www.drdo.gov.in/internship-programme",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "internships",
+    "tags": ["cs", "ece", "mech", "civil"]
+  },
+  {
+    "name": "NASSCOM FutureSkills",
+    "url": "https://futureskills.nasscom.in",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece"]
+  },
+  {
+    "name": "DST INSPIRE Scholarship",
+    "url": "https://online-inspire.gov.in",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "scholarships",
+    "tags": ["all"]
+  },
+  {
+    "name": "KVPY Fellowship",
+    "url": "http://kvpy.iisc.ernet.in/main/index.htm",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "scholarships",
+    "tags": ["all"]
+  },
+  {
+    "name": "National Scholarship Portal",
+    "url": "https://scholarships.gov.in",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "scholarships",
+    "tags": ["all"]
+  },
+  {
+    "name": "Tata Scholarship",
+    "url": "https://www.tatatrusts.org/our-work/individual-grants/education-grants",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "scholarships",
+    "tags": ["all"]
+  },
+  {
+    "name": "Infosys Springboard",
+    "url": "https://infyspringboard.onwingspan.com/web/en/page/home",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["cs", "it", "ece", "mech", "civil", "management"]
+  },
+  {
+    "name": "TCS iON Career Edge",
+    "url": "https://learning.tcsionhub.in/hub/career-edge/",
+    "css_selector": "main",
+    "is_js_rendered": false,
+    "category": "certifications",
+    "tags": ["all"]
+  }
+]
