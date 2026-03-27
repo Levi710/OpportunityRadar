@@ -27,6 +27,8 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
+    # --- 1. Create Tables (Base Schema) ---
+    
     # Sources table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sources (
@@ -39,23 +41,6 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
-
-    # Migration: Add category and tags if missing
-    cursor = conn.execute("PRAGMA table_info(sources)")
-    columns = [row[1] for row in cursor.fetchall()]
-    if "category" not in columns:
-        conn.execute("ALTER TABLE sources ADD COLUMN category TEXT DEFAULT 'general'")
-        logger.info("Added category column to sources table")
-    if "tags" not in columns:
-        conn.execute("ALTER TABLE sources ADD COLUMN tags TEXT DEFAULT '[\"all\"]'")
-        logger.info("Added tags column to sources table")
-
-    # Migration: Add update_count to student_profiles if missing
-    cursor = conn.execute("PRAGMA table_info(student_profiles)")
-    columns = [row[1] for row in cursor.fetchall()]
-    if "update_count" not in columns:
-        conn.execute("ALTER TABLE student_profiles ADD COLUMN update_count INTEGER DEFAULT 0")
-        logger.info("Added update_count column to student_profiles table")
 
     # Snapshots table
     cursor.execute("""
@@ -70,7 +55,7 @@ def init_db():
         );
     """)
 
-    # Student Profiles table (New)
+    # Student Profiles table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS student_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,6 +69,25 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
+
+    # --- 2. Migrations (Updates to Existing Tables) ---
+
+    # Sources: Add category and tags
+    cursor = conn.execute("PRAGMA table_info(sources)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if "category" not in columns:
+        conn.execute("ALTER TABLE sources ADD COLUMN category TEXT DEFAULT 'general'")
+        logger.info("Added category column to sources table")
+    if "tags" not in columns:
+        conn.execute("ALTER TABLE sources ADD COLUMN tags TEXT DEFAULT '[\"all\"]'")
+        logger.info("Added tags column to sources table")
+
+    # Student Profiles: Add update_count (for users who already had the table from V2)
+    cursor = conn.execute("PRAGMA table_info(student_profiles)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if "update_count" not in columns:
+        conn.execute("ALTER TABLE student_profiles ADD COLUMN update_count INTEGER DEFAULT 0")
+        logger.info("Added update_count column to student_profiles table")
 
     conn.commit()
     conn.close()
