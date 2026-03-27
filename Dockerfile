@@ -17,7 +17,7 @@ ENV PORT=7860
 ENV DATABASE_PATH=/app/opportunityradar.db
 
 # 2. Build the UI (Vite needs devDependencies)
-RUN cd ui && npm install
+RUN cd ui && npm ci
 RUN cd ui && npm run build
 
 # Put into production mode for runtime

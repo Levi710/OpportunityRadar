@@ -6,7 +6,6 @@ __pycache__/
 # Build artifacts
 ui/build/
 ui/.svelte-kit/
-ui/package-lock.json
 
 # Local Python Environment
 *.pyc
