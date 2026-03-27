@@ -1,0 +1,22 @@
+# Dependencies
+ui/node_modules/
+.venv/
+__pycache__/
+
+# Build artifacts
+ui/build/
+ui/.svelte-kit/
+ui/package-lock.json
+
+# Local Python Environment
+*.pyc
+*.pyo
+
+# Version control
+.git/
+
+# Env files
+.env
+
+# Data (Don't ignore the DB, as the app needs to read from it during runtime)
+# opportunityradar.db (Keep this comment, do NOT ignore the DB)
