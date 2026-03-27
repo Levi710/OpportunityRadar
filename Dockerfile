@@ -1,14 +1,6 @@
 # Build stage for SvelteKit
-FROM node:20-slim AS ui-builder
+FROM node:20 AS ui-builder
 WORKDIR /app/ui
-
-# Install build dependencies for better-sqlite3
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY ui/package*.json ./
 RUN npm install
 COPY ui/ .
