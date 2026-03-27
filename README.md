@@ -1,3 +1,14 @@
+---
+title: OpportunityRadar
+emoji: 🛰️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # OpportunityRadar V3
 
 OpportunityRadar is a smart web change detection and opportunity tracking system designed for students. It continuously monitors official sources (NPTEL, AICTE, ISRO, Internshala, etc.) for updates on certifications, hackathons, internships, scholarships, and government schemes.
