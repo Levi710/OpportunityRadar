@@ -1,40 +1,27 @@
-# Build stage for SvelteKit
-FROM node:20 AS ui-builder
-WORKDIR /app/ui
-COPY ui/package*.json ./
-RUN npm install
-COPY ui/ .
-RUN npm run build
+# Use Microsoft's official Playwright Python image
+FROM mcr.microsoft.com/playwright/python:v1.44.0-jammy
 
-# Final stage
-FROM python:3.11-slim
 WORKDIR /app
 
-# Install Node.js 20
-RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    build-essential \
-    python3-dev \
-    libsqlite3-dev \
+# Install Node.js 20 (Vite 7 requirement)
+RUN apt-get update && apt-get install -y curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Playwright dependencies
-RUN npx playwright install-deps
+# 1. Build the UI
+COPY ui/package*.json ./ui/
+RUN cd ui && npm install
 
-# Copy Python requirements and install
+COPY ui/ ./ui/
+RUN cd ui && npm run build
+
+# 2. Setup the Scraper
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN playwright install chromium
 
-# Copy the rest of the application
+# 3. Final Prep
 COPY . .
-
-# Copy the built UI from the builder stage
-COPY --from=ui-builder /app/ui/build /app/ui/build
-COPY --from=ui-builder /app/ui/package.json /app/ui/package.json
 
 # Setup start script
 COPY start.sh /app/start.sh
