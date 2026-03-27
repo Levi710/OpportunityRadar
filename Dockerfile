@@ -35,7 +35,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install only Chromium — not Firefox or WebKit
-RUN playwright install chromium --with-deps
+RUN playwright install chromium
 
 # Copy UI and build it (layer cache — only reruns if ui/ changes)
 COPY ui/package*.json ./ui/
