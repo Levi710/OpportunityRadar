@@ -3,10 +3,20 @@
 
   let { data } = $props();
 
-  let name = $state(data.profile?.name || '');
-  let college = $state(data.profile?.college || '');
-  let branch = $state(data.profile?.branch || 'cs');
-  let year = $state(data.profile?.year || 1);
+  let name = $state('');
+  let college = $state('');
+  let branch = $state('cs');
+  let year = $state(1);
+
+  $effect(() => {
+    if (data.profile) {
+      name = data.profile.name || '';
+      college = data.profile.college || '';
+      branch = data.profile.branch || 'cs';
+      year = data.profile.year || 1;
+    }
+  });
+
   let saving = $state(false);
   let message = $state('');
 

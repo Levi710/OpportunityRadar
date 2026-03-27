@@ -9,22 +9,23 @@ RUN apt-get update && apt-get install -y curl \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# 1. Build the UI
-COPY ui/package*.json ./ui/
-RUN cd ui && npm install
-
-COPY ui/ ./ui/
-RUN cd ui && npm run build
-
-# 2. Setup the Scraper
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 3. Final Prep
+# 1. Setup Environment
 COPY . .
 
+# 2. Build the UI
+RUN cd ui && npm install
+RUN cd ui && npm run build
+
+# 3. Setup the Scraper
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 4. Browser Setup (if needed on Railway, usually better in final/runtime)
+# But we'll do it here to ensure it's in the image
+RUN playwright install chromium
+RUN npx playwright install-deps
+
+# 5. Final Prep
 # Setup start script
-COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # Expose the dashboard port
