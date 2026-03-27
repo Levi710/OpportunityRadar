@@ -26,11 +26,7 @@ ENV NODE_ENV=production
 # 3. Setup the Scraper
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. Browser Setup
-RUN playwright install chromium
-RUN npx playwright install-deps
-
-# 5. Final Prep
+# 4. Final Prep
 RUN chmod +x /app/start.sh
 
 # Expose the HF Spaces port
