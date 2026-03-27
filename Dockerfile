@@ -1,35 +1,55 @@
-# Use Microsoft's official Playwright Python image
-FROM mcr.microsoft.com/playwright/python:v1.44.0-jammy
+# Lightweight Python base — NOT the full Playwright image
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install Node.js 20 (Vite 7 requirement)
-RUN apt-get update && apt-get install -y curl \
+# Install system deps + Node.js 20 in one layer to keep image small
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    gnupg \
+    ca-certificates \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# 1. Setup Environment
-COPY . .
+# Create non-root user for HF Spaces (uid 1000)
+RUN useradd -m -u 1000 appuser
 
-# Set environment variables for runtime
-ENV PORT=7860
-ENV DATABASE_PATH=/app/opportunityradar.db
+# Install python packages and Playwright system deps as root
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN playwright install-deps chromium
 
-# 2. Build the UI (Vite needs devDependencies)
+# Prepare Data Directory for SQLite
+RUN mkdir -p /data && chown appuser:appuser /data
+ENV DATABASE_PATH=/data/opportunityradar.db
+
+# Set up UI dependencies (Layer cache)
+COPY ui/package*.json ./ui/
 RUN cd ui && npm ci
+
+# Copy UI source and build
+COPY ui/ ./ui/
+# Disable Svelte static prerendering during build to prevent SQLite crashes
+ENV PRERENDER=false
 RUN cd ui && npm run build
 
-# Put into production mode for runtime
-ENV NODE_ENV=production
+# Copy remaining application files
+COPY --chown=appuser:appuser . .
 
-# 3. Setup the Scraper
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 4. Final Prep
+# Ensure start script is executable
 RUN chmod +x /app/start.sh
 
-# Expose the HF Spaces port
+# Switch to non-root user for actual browser install and execution
+USER appuser
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/appuser/.cache/ms-playwright
+RUN playwright install chromium
+
+# Runtime Environment Variables
+ENV PORT=7860
+ENV NODE_ENV=production
+
 EXPOSE 7860
 
 CMD ["/app/start.sh"]
