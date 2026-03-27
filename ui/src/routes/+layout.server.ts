@@ -1,4 +1,7 @@
 import { getSourceStats, getLastCheckedTime, getCategoryCounts, getStudentProfile, getTodayChangeIds, getTodayTotalIds } from '$lib/db';
+import type { LayoutServerLoad } from './$types';
+
+export const prerender = false;
 
 export const load: LayoutServerLoad = () => {
   const stats = getSourceStats();
@@ -17,3 +20,4 @@ export const load: LayoutServerLoad = () => {
     todayTotalIds
   };
 };
+
