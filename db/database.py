@@ -1,10 +1,11 @@
 """SQLite database connection and table initialization for OpportunityRadar."""
 
 import sqlite3
+import os
 from pathlib import Path
 from loguru import logger
 
-DB_PATH = Path(__file__).resolve().parent.parent / "opportunityradar.db"
+DB_PATH = Path(os.getenv("DATABASE_PATH", str(Path(__file__).resolve().parent.parent / "opportunityradar.db")))
 
 
 def get_connection():
