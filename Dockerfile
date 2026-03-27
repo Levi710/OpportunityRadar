@@ -9,6 +9,20 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     ca-certificates \
+    # Chromium system deps (minimal)
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    # Node.js
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
@@ -16,39 +30,34 @@ RUN apt-get update && apt-get install -y \
 # Create non-root user for HF Spaces (uid 1000)
 RUN useradd -m -u 1000 appuser
 
-# Install python packages and Playwright system deps as root
+# Copy and install Python deps first (layer cache — only reruns if requirements.txt changes)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN playwright install-deps chromium
 
-# Prepare Data Directory for SQLite
-RUN mkdir -p /data && chown appuser:appuser /data
-ENV DATABASE_PATH=/data/opportunityradar.db
+# Install only Chromium — not Firefox or WebKit
+RUN playwright install chromium --with-deps
 
-# Set up UI dependencies (Layer cache)
+# Copy UI and build it (layer cache — only reruns if ui/ changes)
 COPY ui/package*.json ./ui/
 RUN cd ui && npm ci
 
-# Copy UI source and build
 COPY ui/ ./ui/
-# Disable Svelte static prerendering during build to prevent SQLite crashes
-ENV PRERENDER=false
 RUN cd ui && npm run build
 
-# Copy remaining application files
+# Copy rest of app
 COPY --chown=appuser:appuser . .
 
-# Ensure start script is executable
-RUN chmod +x /app/start.sh
+# Persistent storage for SQLite (survives redeployments)
+RUN mkdir -p /data && chown appuser:appuser /data
 
-# Switch to non-root user for actual browser install and execution
-USER appuser
-ENV PLAYWRIGHT_BROWSERS_PATH=/home/appuser/.cache/ms-playwright
-RUN playwright install chromium
-
-# Runtime Environment Variables
+ENV DATABASE_PATH=/data/opportunityradar.db
 ENV PORT=7860
 ENV NODE_ENV=production
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/appuser/.cache/ms-playwright
+
+RUN chmod +x /app/start.sh
+
+USER appuser
 
 EXPOSE 7860
 
