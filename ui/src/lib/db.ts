@@ -6,7 +6,15 @@ import type { ChangeEvent, Source, SourceWithStats, SourceStats, StudentProfile 
 // Resolve database path relative to the ui project root
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.DATABASE_PATH || resolve(__dirname, '..', '..', '..', 'opportunityradar.db');
-const db = new Database(dbPath, { readonly: true });
+
+// Lazy-load the database connection so Vite doesn't crash during build-time bundling
+let dbInstance: Database.Database | null = null;
+function getDb(): Database.Database {
+  if (!dbInstance) {
+    dbInstance = new Database(dbPath, { readonly: true });
+  }
+  return dbInstance;
+}
 
 export interface QueryOptions {
   limit?: number;
@@ -44,8 +52,6 @@ export function getChanges(options: QueryOptions = {}): ChangeEvent[] {
   }
   
   if (branch) {
-    // tags is stored as JSON string like ["cs", "it"]
-    // We use LIKE for simplicity since it's a small dataset, or json_each if available
     query += ` AND (src.tags LIKE ? OR src.tags LIKE '%"all"%')`;
     params.push(`%"${branch}"%`);
   }
@@ -53,11 +59,11 @@ export function getChanges(options: QueryOptions = {}): ChangeEvent[] {
   query += ` ORDER BY s.checked_at DESC LIMIT ?`;
   params.push(limit);
   
-  return db.prepare(query).all(...params) as ChangeEvent[];
+  return getDb().prepare(query).all(...params) as ChangeEvent[];
 }
 
 export function getAllSources(): SourceWithStats[] {
-  return db.prepare(`
+  return getDb().prepare(`
     SELECT 
       src.*,
       (SELECT MAX(s.checked_at) FROM snapshots s WHERE s.source_id = src.id) as last_checked,
@@ -68,9 +74,9 @@ export function getAllSources(): SourceWithStats[] {
 }
 
 export function getSourceStats(): SourceStats {
-  const total = (db.prepare('SELECT COUNT(*) as c FROM sources').get() as any).c;
-  const active = (db.prepare('SELECT COUNT(*) as c FROM sources WHERE active = 1').get() as any).c;
-  const changed_today = (db.prepare(`
+  const total = (getDb().prepare('SELECT COUNT(*) as c FROM sources').get() as any).c;
+  const active = (getDb().prepare('SELECT COUNT(*) as c FROM sources WHERE active = 1').get() as any).c;
+  const changed_today = (getDb().prepare(`
     SELECT COUNT(*) as c FROM snapshots 
     WHERE changed = 1 AND checked_at >= date('now')
   `).get() as any).c;
@@ -78,7 +84,7 @@ export function getSourceStats(): SourceStats {
 }
 
 export function getCategoryCounts(): Record<string, number> {
-  const rows = db.prepare(`
+  const rows = getDb().prepare(`
     SELECT src.category, COUNT(*) as count
     FROM snapshots s
     JOIN sources src ON s.source_id = src.id
@@ -92,7 +98,7 @@ export function getCategoryCounts(): Record<string, number> {
 }
 
 export function getTodayChangeIds(): { id: number, category: string }[] {
-  return db.prepare(`
+  return getDb().prepare(`
     SELECT s.id, src.category
     FROM snapshots s
     JOIN sources src ON s.source_id = src.id
@@ -101,19 +107,17 @@ export function getTodayChangeIds(): { id: number, category: string }[] {
 }
 
 export function getTodayTotalIds(): number[] {
-  return db.prepare(`
+  return getDb().prepare(`
     SELECT id FROM snapshots 
     WHERE changed = 1 AND checked_at >= date('now')
   `).all().map((r: any) => r.id);
 }
 
 export function getStudentProfile(): StudentProfile | null {
-  // For V2 we just get the first one as it's a local single-user system
-  return db.prepare('SELECT * FROM student_profiles LIMIT 1').get() as StudentProfile || null;
+  return getDb().prepare('SELECT * FROM student_profiles LIMIT 1').get() as StudentProfile || null;
 }
 
 export function upsertStudentProfile(profile: Omit<StudentProfile, 'id'>): void {
-  // Use a writable connection for profile updates
   const writeDb = new Database(dbPath);
   try {
     writeDb.prepare(`
@@ -128,6 +132,6 @@ export function upsertStudentProfile(profile: Omit<StudentProfile, 'id'>): void 
 }
 
 export function getLastCheckedTime(): string | null {
-  const row = db.prepare('SELECT MAX(checked_at) as t FROM snapshots').get() as any;
+  const row = getDb().prepare('SELECT MAX(checked_at) as t FROM snapshots').get() as any;
   return row?.t ?? null;
 }
