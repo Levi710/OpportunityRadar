@@ -24,9 +24,10 @@ def compare(source_id, new_hash, raw_content):
     latest = get_latest_snapshot(source_id)
 
     if latest is None:
-        # First time checking this source — store baseline
-        insert_snapshot(source_id, new_hash, raw_content, changed=False)
-        logger.info("Source {} — first run, baseline snapshot stored", source_id)
+        # First time checking this source — flag as "changed" in DB so UI populates immediately!
+        insert_snapshot(source_id, new_hash, raw_content, changed=True)
+        logger.info("Source {} — first run, baseline snapshot stored (visible in UI)", source_id)
+        # Return False so we don't spam 25+ Telegram alerts on the very first boot
         return (False, "first_run")
 
     if latest["content_hash"] == new_hash:
