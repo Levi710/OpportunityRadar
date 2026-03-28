@@ -24,6 +24,10 @@ def init_db():
 
     This is safe to call multiple times — it uses IF NOT EXISTS and checks column existence.
     """
+    # Ensure parent directory exists (critical if a custom DATABASE_PATH is used in a volume)
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    
+    logger.info("Initializing database at {}", DB_PATH)
     conn = get_connection()
     cursor = conn.cursor()
 

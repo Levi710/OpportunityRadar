@@ -3,15 +3,41 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import type { ChangeEvent, Source, SourceWithStats, SourceStats, StudentProfile } from './types';
 
-// Resolve database path relative to the ui project root
+// Resolve database path relative to the project root
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = process.env.DATABASE_PATH || resolve(__dirname, '..', '..', '..', 'opportunityradar.db');
+
+// Robust path resolution:
+// 1. Env var (standard)
+// 2. Fallback to project root based on CWD
+let dbPath = process.env.DATABASE_PATH || '';
+
+if (!dbPath) {
+  // If we are in the 'ui' directory (typical dev/prod setup), the DB is one level up
+  const cwd = process.cwd();
+  if (cwd.endsWith('ui') || cwd.endsWith('ui/')) {
+    dbPath = resolve(cwd, '..', 'opportunityradar.db');
+  } else {
+    // Otherwise assume it's in the current directory or one level down in 'ui'
+    dbPath = resolve(cwd, 'opportunityradar.db');
+  }
+}
 
 // Lazy-load the database connection so Vite doesn't crash during build-time bundling
 let dbInstance: Database.Database | null = null;
 function getDb(): Database.Database {
   if (!dbInstance) {
-    dbInstance = new Database(dbPath, { readonly: true });
+    try {
+      dbInstance = new Database(dbPath, { readonly: true });
+    } catch (err) {
+      console.error(`--- SQLITE CONNECTION ERROR ---`);
+      console.error(`DATABASE_PATH environment variable: ${process.env.DATABASE_PATH}`);
+      console.error(`Attempted path: ${dbPath}`);
+      console.error(`Current working directory: ${process.cwd()}`);
+      console.error(`Error code: ${(err as any).code}`);
+      console.error(`Error message: ${(err as any).message}`);
+      console.error(`-------------------------------`);
+      throw err;
+    }
   }
   return dbInstance;
 }
@@ -124,8 +150,9 @@ export function getStudentProfile(): StudentProfile | null {
 
 export function upsertStudentProfile(profile: Omit<StudentProfile, 'id' | 'update_count'>): void {
   // Use a writable connection for profile updates
-  const writeDb = new Database(dbPath);
+  let writeDb: Database.Database;
   try {
+    writeDb = new Database(dbPath);
     writeDb.prepare(`
       INSERT INTO student_profiles (email, name, branch, year, college, update_count)
       VALUES (?, ?, ?, ?, ?, 0)
@@ -136,8 +163,10 @@ export function upsertStudentProfile(profile: Omit<StudentProfile, 'id' | 'updat
       college=excluded.college,
       update_count = update_count + 1
     `).run('user@local', profile.name, profile.branch, profile.year, profile.college);
-  } finally {
     writeDb.close();
+  } catch (err) {
+    console.error(`ERROR: Failed to update profile in database at ${dbPath}`);
+    throw err;
   }
 }
 
